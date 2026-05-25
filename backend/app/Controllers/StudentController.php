@@ -216,6 +216,7 @@ class StudentController extends BaseController
         $data = $this->request->body();
         $studentId = (int)$student['sub'];
         $returnRequestId = (int)($data['return_request_id'] ?? 0);
+        $recipientId = (int)($data['recipient_id'] ?? 0);
         $message = trim($data['message'] ?? '');
         $recipient = trim($data['recipient'] ?? '');
 
@@ -229,7 +230,13 @@ class StudentController extends BaseController
         $seen = 0;
 
         if ($recipient === 'member') {
-            if ($returnRequestId) {
+            if ($recipientId > 0) {
+                $member = $this->conn->query("SELECT id FROM users WHERE id = {$recipientId} AND role = 'member' LIMIT 1")->fetch_assoc();
+                if (!$member) {
+                    Response::json(['error' => 'Member not found'], 404);
+                }
+                $memberId = (int)$member['id'];
+            } elseif ($returnRequestId) {
                 $returnRequest = $this->conn->query("SELECT id, issue_id FROM return_requests WHERE id = {$returnRequestId} AND student_id = {$studentId}")->fetch_assoc();
                 if (!$returnRequest) {
                     Response::json(['error' => 'Return request not found'], 404);
@@ -249,16 +256,20 @@ class StudentController extends BaseController
                 $memberId = (int)$member['id'];
             }
             $stmt = $this->conn->prepare('INSERT INTO notifications (recipient_id, sender_id, sender_role, title, message, type, related_id, seen) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('iisssiii', $memberId, $studentId, $senderRole, $title, $message, $type, $returnRequestId, $seen);
+            $stmt->bind_param('iissssii', $memberId, $studentId, $senderRole, $title, $message, $type, $returnRequestId, $seen);
         } else {
-            $adminResult = $this->conn->query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
-            $admin = $adminResult ? $adminResult->fetch_assoc() : null;
+            if ($recipientId > 0) {
+                $admin = $this->conn->query("SELECT id FROM users WHERE id = {$recipientId} AND role = 'admin' LIMIT 1")->fetch_assoc();
+            } else {
+                $adminResult = $this->conn->query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
+                $admin = $adminResult ? $adminResult->fetch_assoc() : null;
+            }
             if (!$admin) {
                 Response::json(['error' => 'Admin not found'], 404);
             }
             $adminId = (int)$admin['id'];
             $stmt = $this->conn->prepare('INSERT INTO notifications (recipient_id, sender_id, sender_role, title, message, type, related_id, seen) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('iisssiii', $adminId, $studentId, $senderRole, $title, $message, $type, $returnRequestId, $seen);
+            $stmt->bind_param('iissssii', $adminId, $studentId, $senderRole, $title, $message, $type, $returnRequestId, $seen);
         }
 
         try {
@@ -292,6 +303,11 @@ class StudentController extends BaseController
         } catch (mysqli_sql_exception $exception) {
             Response::json(['error' => 'Failed to update notification'], 500);
         }
+    }
+
+    public function deleteNotification(): void
+    {
+        $this->deleteNotificationForRole('student');
     }
 }
 ?>

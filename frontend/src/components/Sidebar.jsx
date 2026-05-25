@@ -53,6 +53,12 @@ const NAV_CONFIG = {
       icon: ClipboardList,
       badgeKey: "returnRequests",
     },
+    {
+      name: "Notifications",
+      href: "/member/notifications",
+      icon: BellIcon,
+      badgeKey: "notifications",
+    },
     { name: "Tracking", href: "/member/tracking", icon: SearchIcon },
     {
       name: "Reissue",
@@ -75,6 +81,12 @@ const NAV_CONFIG = {
       href: "/admin/book-requests",
       icon: Eye,
       badgeKey: "bookRequests",
+    },
+    {
+      name: "Notifications",
+      href: "/admin/notifications",
+      icon: BellIcon,
+      badgeKey: "notifications",
     },
   ],
 };
@@ -127,27 +139,35 @@ export default function Sidebar({ role, onLogout }) {
         }
 
         if (role === "member") {
-          const [issueData, returnData, reissueData] = await Promise.all([
+          const [issueData, returnData, reissueData, notificationData] = await Promise.all([
             apiFetch("member/issue-requests"),
             apiFetch("member/return-requests"),
             apiFetch("member/reissue-requests"),
+            apiFetch("member/notifications"),
           ]);
           if (!active) return;
           setBadges({
             issueRequests: issueData.requests?.length || 0,
             returnRequests: returnData.requests?.length || 0,
             reissueRequests: reissueData.requests?.length || 0,
+            notifications:
+              notificationData.notifications?.filter((n) => !n.seen).length || 0,
           });
           return;
         }
 
         if (role === "admin") {
-          const requestData = await apiFetch("admin/book-requests");
+          const [requestData, notificationData] = await Promise.all([
+            apiFetch("admin/book-requests"),
+            apiFetch("admin/notifications"),
+          ]);
           if (!active) return;
           setBadges({
             bookRequests:
               requestData.requests?.filter((item) => item.status === "pending")
                 .length || 0,
+            notifications:
+              notificationData.notifications?.filter((n) => !n.seen).length || 0,
           });
         }
       } catch {

@@ -10,8 +10,10 @@ import AdminCreateMemberPage from "./pages/admin/AdminCreateMemberPage";
 import AdminMemberCredentialsPage from "./pages/admin/AdminMemberCredentialsPage";
 import AdminBookRequestsPage from "./pages/admin/AdminBookRequestsPage";
 import AdminBooksPage from "./pages/admin/AdminBooksPage";
+import AdminNotificationsPage from "./pages/admin/AdminNotificationsPage";
 import MemberDashboardPage from "./pages/member/MemberDashboardPage";
 import MemberIssueBookPage from "./pages/member/MemberIssueBookPage";
+import MemberNotificationsPage from "./pages/member/MemberNotificationsPage";
 import MemberRequestBookPage from "./pages/member/MemberRequestBookPage";
 import MemberStudentRequestsPage from "./pages/member/MemberStudentRequestsPage";
 import MemberReturnRequestsPage from "./pages/member/MemberReturnRequestsPage";
@@ -120,6 +122,7 @@ export default function App() {
           element={<AdminMemberCredentialsPage />}
         />
         <Route path="book-requests" element={<AdminBookRequestsPage />} />
+        <Route path="notifications" element={<AdminNotificationsPage />} />
       </Route>
       <Route
         path="/member"
@@ -140,6 +143,7 @@ export default function App() {
         <Route path="tracking" element={<MemberTrackingPage />} />
         <Route path="reissue" element={<MemberReissuePage />} />
         <Route path="students" element={<MemberStudentsPage />} />
+        <Route path="notifications" element={<MemberNotificationsPage />} />
       </Route>
       <Route
         path="/student"

@@ -84,7 +84,7 @@ const HomePage = () => {
             <span className="relative inline-flex size-2 rounded-full bg-green-600" />
           </div>
           <p className="text-sm text-black/60">
-            Join 100+ books and growup your skill
+            Join 100+ books and grow up your skills
           </p>
         </div>
 

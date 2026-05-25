@@ -253,6 +253,21 @@ class AdminController extends BaseController
         Response::json(['message' => 'Message sent to student']);
     }
 
+    public function listNotifications(): void
+    {
+        $this->listNotificationsForRole('admin');
+    }
+
+    public function markNotificationSeen(): void
+    {
+        $this->markNotificationSeenForRole('admin');
+    }
+
+    public function deleteNotification(): void
+    {
+        $this->deleteNotificationForRole('admin');
+    }
+
     public function createBook(): void
     {
         $admin = $this->auth->requireRole(['admin']);

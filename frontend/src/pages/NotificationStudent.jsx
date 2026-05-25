@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { BellIcon, SearchIcon, X } from "lucide-react";
+import { BellIcon, SearchIcon, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import Loading from "../components/Loading";
 import { apiFetch } from "../api";
@@ -91,6 +91,7 @@ export default function NotificationStudent() {
         method: "POST",
         body: JSON.stringify({
           return_request_id: messageModal.return_request_id || 0,
+          recipient_id: messageModal.sender_id || 0,
           message: messageText.trim(),
           recipient: recipient,
         }),
@@ -103,6 +104,24 @@ export default function NotificationStudent() {
       toast.error(err.message);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleDelete = async (notificationId) => {
+    if (!window.confirm("Are you sure to delete this conversation? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      await apiFetch("student/delete-notification", {
+        method: "POST",
+        body: JSON.stringify({ notification_id: notificationId }),
+      });
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      window.dispatchEvent(new Event("student-badge-refresh"));
+      toast.success("Message deleted");
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
@@ -120,8 +139,8 @@ export default function NotificationStudent() {
               Notification Panel
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Member approvals, rejections, admin/member messages, and return
-              updates yahan dikhenge.
+              Member approvals, rejections, admin or member messages, and return
+              updates will appear here.
             </p>
           </div>
           <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 lg:max-w-md">
@@ -180,31 +199,42 @@ export default function NotificationStudent() {
                     {notification.message}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
-                    <span>Sent by: {notification.sender_role}</span>
+                    <span>Sent by: {notification.sender_name || notification.sender_role}</span>
+                    <span>Role: {notification.sender_role}</span>
                     <span>Date: {formatDate(notification.created_at)}</span>
                   </div>
-                  <button
-                    onClick={() => {
-                      setMessageModal({
-                        id: notification.id,
-                        return_request_id: notification.related_id || 0,
-                        sender_role: notification.sender_role,
-                        sender_name:
-                          notification.sender_name || notification.sender_role,
-                      });
-                    }}
-                    className="mt-4 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-                  >
-                    Send Reply Message
-                  </button>
-                  {!notification.seen && (
+                  <div className="mt-4 flex flex-wrap gap-2">
                     <button
-                      onClick={() => handleMarkSeen(notification.id)}
-                      className="ml-2 mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                      onClick={() => {
+                        setMessageModal({
+                          id: notification.id,
+                          return_request_id: notification.related_id || 0,
+                          sender_id: notification.sender_id || 0,
+                          sender_role: notification.sender_role,
+                          sender_name:
+                            notification.sender_name || notification.sender_role,
+                        });
+                      }}
+                      className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                     >
-                      Mark as Seen
+                      Send Reply Message
                     </button>
-                  )}
+                    {!notification.seen && (
+                      <button
+                        onClick={() => handleMarkSeen(notification.id)}
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        Mark as Seen
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDelete(notification.id)}
+                      className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </article>

@@ -179,6 +179,21 @@ class MemberController extends BaseController
         Response::json(['message' => 'Message sent to student']);
     }
 
+    public function listNotifications(): void
+    {
+        $this->listNotificationsForRole('member');
+    }
+
+    public function markNotificationSeen(): void
+    {
+        $this->markNotificationSeenForRole('member');
+    }
+
+    public function deleteNotification(): void
+    {
+        $this->deleteNotificationForRole('member');
+    }
+
     public function returnBook(): void
     {
         $this->auth->requireRole(['member']);

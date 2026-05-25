@@ -79,6 +79,9 @@ $router->register('POST', 'admin/members/update', AdminController::class, 'updat
 $router->register('GET', 'admin/students', AdminController::class, 'listStudents');
 $router->register('POST', 'admin/students/delete', AdminController::class, 'deleteStudent');
 $router->register('POST', 'admin/students/message', AdminController::class, 'messageStudent');
+$router->register('GET', 'admin/notifications', AdminController::class, 'listNotifications');
+$router->register('POST', 'admin/mark-notification-seen', AdminController::class, 'markNotificationSeen');
+$router->register('POST', 'admin/delete-notification', AdminController::class, 'deleteNotification');
 $router->register('POST', 'admin/books', AdminController::class, 'createBook');
 $router->register('GET', 'admin/book-requests', AdminController::class, 'listBookRequests');
 $router->register('POST', 'admin/book-requests/update-status', AdminController::class, 'updateBookRequestStatus');
@@ -93,6 +96,9 @@ $router->register('POST', 'member/issue-request-reject', MemberController::class
 $router->register('GET', 'member/students', MemberController::class, 'listStudents');
 $router->register('POST', 'member/students/delete', MemberController::class, 'deleteStudent');
 $router->register('POST', 'member/students/message', MemberController::class, 'messageStudent');
+$router->register('GET', 'member/notifications', MemberController::class, 'listNotifications');
+$router->register('POST', 'member/mark-notification-seen', MemberController::class, 'markNotificationSeen');
+$router->register('POST', 'member/delete-notification', MemberController::class, 'deleteNotification');
 $router->register('POST', 'member/return-book', MemberController::class, 'returnBook');
 $router->register('GET', 'member/issues', MemberController::class, 'listIssues');
 $router->register('POST', 'member/book-requests', MemberController::class, 'createBookRequest');
@@ -108,6 +114,7 @@ $router->register('GET', 'student/reissue-requests', StudentController::class, '
 $router->register('GET', 'student/notifications', StudentController::class, 'listNotifications');
 $router->register('POST', 'student/return-message', StudentController::class, 'sendReturnMessage');
 $router->register('POST', 'student/mark-notification-seen', StudentController::class, 'markNotificationSeen');
+$router->register('POST', 'student/delete-notification', StudentController::class, 'deleteNotification');
 $router->register('GET', 'student/profile', StudentController::class, 'profile');
 $router->register('POST', 'student/profile', StudentController::class, 'updateProfile');
 $router->register('POST', 'student/return-request', StudentController::class, 'createReturnRequest');
