@@ -5,7 +5,6 @@
 - Member (Library staff)
 - Student
 
-## It is create by Ayush kumar mishra.
 
 ## Core Features Included
 - JWT login for username/email + password
